@@ -9,7 +9,7 @@ np_dir=r'\\hydro-nas\Team\Projects\5635_SFEI Carbon and GHG\Accretion\20211223\n
 ras_dir=r'\\hydro-nas\Team\Projects\5635_SFEI Carbon and GHG\GIS\raster'
 
 #File name
-nam='Draft_1_1_ft_2018'
+nam='Draft_1_1_ft_2049'
 
 #Raster template
 ras_temp_nam='Layout_Domain.tif'
