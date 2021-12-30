@@ -7,14 +7,14 @@ import os
 #np_dir=r'\\hydro-nas\Team\Projects\5635_SFEI Carbon and GHG\Accretion\20211223'
 #np_dir=r'\\hydro-nas\Team\Projects\5635_SFEI Carbon and GHG\GIS\np_arrays'
 #np_dir=r'\\hydro-nas\Team\Projects\5635_SFEI Carbon and GHG\Accretion\20211223\np_arrays'
-#np_dir=r'\\hydro-nas\Team\Projects\5635_SFEI Carbon and GHG\Accretion\20211223\np_arrays\Draft_1_1_ft'
-np_dir=r'\\hydro-nas\Team\Projects\5635_SFEI Carbon and GHG\Accretion\20211223\np_arrays\Draft_2_6_ft'
+np_dir=r'\\hydro-nas\Team\Projects\5635_SFEI Carbon and GHG\Accretion\20211223\np_arrays\Draft_1_1_ft'
+#np_dir=r'\\hydro-nas\Team\Projects\5635_SFEI Carbon and GHG\Accretion\20211223\np_arrays\Draft_2_6_ft'
 
 ras_dir=r'\\hydro-nas\Team\Projects\5635_SFEI Carbon and GHG\GIS\raster'
 
 #File name
 #nam='MTL_2_6_ft_2056'
-Names=['Draft_2_6_ft_2056carbon_cum_gC_cm2']
+Names=['Draft_1_1_ft_2056_years_to_MTL_10']
 
 #Raster template
 ras_temp_nam='Layout_Domain.tif'
