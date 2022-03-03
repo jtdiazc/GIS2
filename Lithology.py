@@ -12,7 +12,7 @@ import os
 
 #Set parameters manually
 
-if True:
+if False:
     ###Are we drawing lines this run? True or False
     Lines=True
     
@@ -86,6 +86,12 @@ if True:
     #Image vertical position
     Iy=50
 
+    #X-section coordinates
+    p0x = 6219784
+    p0y = 2190613
+    p1x = 6221597
+    p1y = 2193674
+
 
 #Import parameters from CSV
 
@@ -95,28 +101,32 @@ os.chdir(r'P:\Applications\CrossSections')
 ###Path to spreadsheet
 p2s=r"P:\Projects\5572_Dutch Slough GW Monitoring\GIS\Map\2021"
 
-if False:
+if True:
     GraphPar=pd.read_csv(os.path.join(p2s,'GraphicalParameters.csv'),header=None).to_numpy()
     Lines=np.array(GraphPar[0]=='TRUE')[0]
     Image_draw=np.array(GraphPar[1]=='TRUE')[0]
-    width_size= int(GraphPar[2])
-    height_size= int(GraphPar[3])
-    mx=int(GraphPar[4])
-    mxr=int(GraphPar[5])
-    my=int(GraphPar[6])
-    myb=int(GraphPar[7])
-    sux=int(GraphPar[8])
-    suy=int(GraphPar[9])
-    ltck=int(GraphPar[10])
-    tckxoff=int(GraphPar[11])
-    tckyoff=int(GraphPar[12])
-    wlw=int(GraphPar[13])
-    lgoff=int(GraphPar[14])
-    lbz=int(GraphPar[15])
-    delta_leg=int(GraphPar[16])
-    Iw=int(GraphPar[17])
-    Ih=int(GraphPar[18])
-    Iy=int(GraphPar[19])
+    width_size= int(float(GraphPar[2]))
+    height_size= int(float(GraphPar[3]))
+    mx=int(float(GraphPar[4]))
+    mxr=int(float(GraphPar[5]))
+    my=int(float(GraphPar[6]))
+    myb=int(float(GraphPar[7]))
+    sux=int(float(GraphPar[8]))
+    suy=int(float(GraphPar[9]))
+    ltck=int(float(GraphPar[10]))
+    tckxoff=int(float(GraphPar[11]))
+    tckyoff=int(float(GraphPar[12]))
+    wlw=int(float(GraphPar[13]))
+    lgoff=int(float(GraphPar[14]))
+    lbz=int(float(GraphPar[15]))
+    delta_leg=int(float(GraphPar[16]))
+    Iw=int(float(GraphPar[17]))
+    Ih=int(float(GraphPar[18]))
+    Iy=int(float(GraphPar[19]))
+    p0x =int(float(GraphPar[20]))
+    p0y =int(float(GraphPar[21]))
+    p1x = int(float(GraphPar[22]))
+    p1y =int(float(GraphPar[23]))
 
 #Horizontal scale
 xscale=width_size-mx-mxr
@@ -175,8 +185,7 @@ if Lines:
     Layers=pd.read_csv(os.path.join(p2s,'GUs.csv'),encoding='utf-8-sig',header=None)
     Layers=Layers.dropna(axis=1,how='all')
     Layers=Layers.to_numpy()
-#    Layers=np.genfromtxt('GUs.csv', delimiter=',',dtype='str')
-#    Layers[np.where(Layers!='')]
+
 
 
 
@@ -214,10 +223,7 @@ if False:
 
 
 #Let's specify transect coordinates
-p0x=6219784
-p0y=2190613
-p1x=6221597
-p1y=2193674
+
 
 
 
@@ -279,13 +285,9 @@ zdums2[:]=np.nan
 if Lines:
 ####Let's get the transect coordinates for the layers
     for layer in range(len(Layers[Layers!=''])+1):
-#    for layer in range(len(Layers)):
-        xdums=GUdata[:,3*layer]
-        xdums=xdums[~np.isnan(xdums)]
-        ydums=GUdata[:,3*layer+1]
-        ydums=ydums[~np.isnan(ydums)]
-        zdums=GUdata[:,3*layer+2]
-        zdums=zdums[~np.isnan(zdums)]
+        xdums=GUdata[~np.isnan(GUdata[:,3*layer]),3*layer]
+        ydums=GUdata[~np.isnan(GUdata[:,3*layer+1]),3*layer+1]
+        zdums=GUdata[~np.isnan(GUdata[:,3*layer+2]),3*layer+2]
         xdums2_dum=np.array([])
         for point in range(len(xdums)):
             
@@ -300,22 +302,23 @@ if Lines:
             d_dum=int(np.sqrt(xdum[0]**2+xdum[1]**2))
             xdums2_dum=np.append(xdums2_dum,d_dum)
 
+        #Let's sort from left to right
         xdums2_dum=xdums2_dum[np.argsort(xdums2_dum)]
         zdums=zdums[np.argsort(xdums2_dum)]
-        xdums2[layer]=xdums2_dum
-        zdums2[layer]=zdums
+        xdums2[layer][0:len(xdums2_dum)]=xdums2_dum
+        zdums2[layer][0:len(zdums)]=zdums
 #        GUdata2=np.append(GUdata2,np.array([xdums2,zdums]),axis=1).astype('int')
 
     
 #min of x
-minx=min(x)
+minx=min(x[np.where(~np.isnan(x))])
 
 #max of x
-maxx=max(x)
+maxx=max(x[np.where(~np.isnan(x))])
 
 if Lines:
-    minx=min(minx,np.min(xdums2))
-    maxx =max(maxx,np.max(zdums))
+    minx=min(minx,np.min(xdums2[~np.isnan(xdums2)]))
+    maxx =max(maxx,np.max(xdums2[~np.isnan(xdums2)]))
 
 
 #x axis limits
@@ -323,11 +326,20 @@ if Lines:
 xlim=np.array([minx,maxx])
 
 #Min of z
-#minz=np.amin(z[np.where(~np.isnan(z))])
-minz=int(ylim[0]/10)*10-5
+minz=np.amin(z[np.where(~np.isnan(z))])
+#minz=int(ylim[0]/10)*10-5
+
+
+
 
 maxz=np.amax(z[np.where(~np.isnan(z))])
 #z axis limits
+
+if Lines:
+    minz=min(minz,np.min(zdums2[~np.isnan(zdums2)]))
+    maxz =max(maxz,np.max(zdums2[~np.isnan(zdums2)]))
+
+
 #ylim=np.array([round(minz/10)*10,round(maxz/10)*10]).astype('int')
 ylim=np.array([minz,maxz])
 
@@ -411,26 +423,27 @@ str0=str0+Patterns
 if Lines:
 ###Let's draw layers
     for layer in range(len(Layers[Layers!=''])):
-        #Points for layer
-        lendum=xdums2.shape[1]
         #Top
-        #xdum1=GUdata2[0,range(3*layer,3*layer+3)]
-#        xdum1 = GUdata2[0, layer*lendum: lendum * layer + lendum]
-        xdum1=xdums2[layer]
+        #Let's remove nas from the top line of the polygon x and y coordinates
+        xdum1=xdums2[layer][~np.isnan(xdums2[layer])]
+        zdum1=zdums2[layer][~np.isnan(zdums2[layer])]
+        #Let's sort from left to right the y coordinates of the line on top according to their x value for the top line of the polygon
         sort_ind_0 = np.argsort(xdum1)
-
-
-        zdum1=zdums2[layer]
         zdum1 = zdum1[sort_ind_0]
+        # Let's sort x coordinates from left to right for the top line of the polygon
         xdum1 = np.sort(xdum1)
-    #Bottom
-#        xdum2=GUdata2[0,(layer+1)*lendum: lendum * (layer+1) + lendum]
-        xdum2=xdums2[layer+1]
+
+        #Bottom
+        # Let's remove nas from the bottom line of the polygon x and y coordinates
+        xdum2=xdums2[layer+1][~np.isnan(xdums2[layer+1])]
+        zdum2 = zdums2[layer + 1][~np.isnan(zdums2[layer+1])]
+
+        #For the bottom line, we sort the points from right to left according to their x coordinate
         sort_ind=np.argsort(xdum2)[::-1]
-#        zdum2=GUdata2[1,(layer+1)*lendum: lendum * (layer+1) + lendum]
-        zdum2 =zdums2[layer+1]
         zdum2=zdum2[sort_ind]
         xdum2=np.sort(xdum2)[::-1]
+
+        #Now, we format the coordinates for the svg file
         points_dum=np.concatenate((np.array([xdum1,zdum1]),np.array([xdum2,zdum2])),axis=1).astype('int')
         points_dum_str=""
         coldum=lithcol[np.argwhere(lith==Layers[layer])][0][0]
