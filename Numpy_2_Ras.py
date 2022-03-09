@@ -4,7 +4,14 @@ import os
 
 #List of numpy arrays we have to process
 npdir1=r"\\hydro-nas\Team\Projects\5635_SFEI Carbon and GHG\Accretion\20211223\np_arrays"
-names1=[r"\Draft_1_1_ft\Draft_1_1_ft_2056",r'\Draft_2_6_ft\Draft_2_6_ft_2056']
+names1=[r"\Draft_1_1_ft\Draft_1_1_ft_2056",r'\Draft_1_1_ft\Draft_1_1_ft_2056_years_to_MTL_10',
+        r"\Draft_1_1_ft\Draft_1_1_ft_2018carbon_rate_gC_cm2_yr",
+        r"\Draft_1_1_ft\Draft_1_1_ft_2056carbon_rate_gC_cm2_yr",
+        r"\Draft_1_1_ft\Draft_1_1_ft_2056carbon_cum_gC_cm2",
+        r'\Draft_2_6_ft\Draft_2_6_ft_2056',r'\Draft_2_6_ft\Draft_2_6_ft_2056_years_to_MTL_10',
+        r'\Draft_2_6_ft\Draft_2_6_ft_2018carbon_rate_gC_cm2_yr',
+        r'\Draft_2_6_ft\Draft_2_6_ft_2056carbon_rate_gC_cm2_yr',
+        r'\Draft_2_6_ft\Draft_2_6_ft_2056carbon_cum_gC_cm2']
 Paths=[npdir1+"\\"+name  for name in names1]
 
 
