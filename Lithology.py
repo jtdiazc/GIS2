@@ -12,7 +12,7 @@ import os
 
 #Set parameters manually
 
-if False:
+if True:
     ###Are we drawing lines this run? True or False
     Lines=True
     
@@ -88,9 +88,9 @@ if False:
 
     #X-section coordinates
     p0x = 6219784
-    p0y = 2190613
-    p1x = 6221597
-    p1y = 2193674
+    p0y = 2190612
+    p1x = 6221585
+    p1y = 2193854
 
 
 #Import parameters from CSV
@@ -99,9 +99,9 @@ if False:
 os.chdir(r'P:\Applications\CrossSections')
 
 ###Path to spreadsheet
-p2s=r"P:\Projects\5572_Dutch Slough GW Monitoring\GIS\Map\2021"
+p2s=r"P:\Applications\CrossSections"
 
-if True:
+if False:
     GraphPar=pd.read_csv(os.path.join(p2s,'GraphicalParameters.csv'),header=None).to_numpy()
     Lines=np.array(GraphPar[0]=='TRUE')[0]
     Image_draw=np.array(GraphPar[1]=='TRUE')[0]
@@ -152,8 +152,6 @@ y0=y0.reshape(y0.shape[1])
 
 #Layers for each well log
 
-#from numpy import genfromtxt
-#z = -genfromtxt('Depths.csv', delimiter=',').transpose()
 z=pd.read_csv(os.path.join(p2s,'Depths.csv'),encoding='utf-8-sig',header=None)
 #Let's drop nas
 z=z.dropna(axis=0,how='all')
@@ -162,11 +160,6 @@ z=z.dropna(axis=1,how='all')
 #Let's transpose
 z=z.to_numpy().transpose()
 
-#z=-np.array([[-12,-27,-49,-81,np.nan,np.nan,np.nan,np.nan,np.nan],
-#             [-18,-20,-21,-26,-32,-43,-42,-58,-63],
-#             [ -9,-13,-28,-56,-64,np.nan,np.nan,np.nan,np.nan]])
-
-
 
 
 #Geologies
@@ -174,10 +167,6 @@ geo=pd.read_csv(os.path.join(p2s,'Lithology.csv'),encoding='utf-8-sig',header=No
 geo=geo.dropna(axis=0,how='all')
 geo=geo.dropna(axis=1,how='all')
 geo=geo.to_numpy().transpose()
-#geo=np.genfromtxt('Lithology.csv', delimiter=',',dtype='str').transpose()
-#geo=np.array([["PT","SP","CL",np.nan,np.nan,np.nan,np.nan,np.nan],
-#             ["OL","PT","SM","OH","SM","SP","SM","CL"],
-#             [ "OL","PT","SM","CL",np.nan,np.nan,np.nan,np.nan,np.nan]])
 
 
 if Lines:
@@ -254,12 +243,8 @@ x=np.array([])
 
 Image='Transect.jpg'
 
-
-
 ###Image coordinates
 Ix=width_size-50-Iw
-
-
 
 #Lets get the transect coordinates for the wells
 #Lets loop through wells
@@ -310,24 +295,18 @@ if Lines:
 #        GUdata2=np.append(GUdata2,np.array([xdums2,zdums]),axis=1).astype('int')
 
     
-#min of x
-minx=min(x[np.where(~np.isnan(x))])
 
-#max of x
-maxx=max(x[np.where(~np.isnan(x))])
 
-if Lines:
-    minx=min(minx,np.min(xdums2[~np.isnan(xdums2)]))
-    maxx =max(maxx,np.max(xdums2[~np.isnan(xdums2)]))
-
+minx=np.sqrt(p0x**2+p0y**2)
+maxx=np.sqrt(p1x**2+p1y**2)
 
 #x axis limits
-#xlim=np.array([int(minx/10**sux)*10**sux,int(maxx/10**sux+1)*10**sux])
+
 xlim=np.array([minx,maxx])
 
 #Min of z
 minz=np.amin(z[np.where(~np.isnan(z))])
-#minz=int(ylim[0]/10)*10-5
+
 
 
 
@@ -349,9 +328,8 @@ ylim=np.array([minz,maxz])
 dtx=10**int(np.log10(xlim[1]-xlim[0])-1)
 
 xticks=np.arange(xlim[0],xlim[1]+dtx,dtx)
-#xticks=np.append(xticks,xlim[1])
-xlim[0]=xlim[0]
-xticks0=xticks-np.amin(xticks)
+
+xticks0=xticks-minx
 
 #y tickmarks
 dty=5
@@ -363,8 +341,7 @@ yticks0=yticks
 
 #Corrected x coordinates of logs
 x2=(x-minx)/(maxx-minx)*xscale+mx-wlw/2
-#Corrected x coordinates of layers
-#GUdata2[0]=(GUdata2[0]-minx)/(maxx-minx)*xscale+mx-wlw/2
+
 
 
 #Corrected x coordinates of tickmarks
@@ -380,9 +357,9 @@ z2=(z-minz)/(maxz-minz)*yscale+my
 
 
 if Lines:
-#Corrected z coordinates of layers
+    #Corrected z coordinates of layers
     zdums2=(zdums2-minz)/(maxz-minz)*yscale+my
-#Corrected x coordinates
+    #Corrected x coordinates
     xdums2=(xdums2-minx)/(maxx-minx)*xscale+mx
 
 
