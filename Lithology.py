@@ -271,7 +271,8 @@ if Lines:
 
     #Let's find unique x values of layer points
 
-    x_lay=np.sort(np.unique(xdums2))
+#    x_lay=np.sort(np.unique(xdums2))
+    x_lay=np.linspace(np.min(xdums2[~np.isnan(xdums2)]),np.max(xdums2[~np.isnan(xdums2)]),num=int(np.max(xdums2[~np.isnan(xdums2)])-np.min(xdums2[~np.isnan(xdums2)])),endpoint=True)
     x_lay=x_lay[~np.isnan(x_lay)]
 
     #Let's create array where we will interpolate and extrapolate everything
