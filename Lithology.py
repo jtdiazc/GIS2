@@ -173,12 +173,12 @@ if Lines:
 ###Import geologic units
     Layers=pd.read_csv(os.path.join(p2s,'GUs.csv'),encoding='utf-8-sig',header=None)
     Layers=Layers.dropna(axis=1,how='all')
-    Layers=Layers.to_numpy()
+    Layers=Layers.iloc[0,:].to_numpy()
 
 
 
 
-###Depths of layers
+    ###Depths of layers
     GUdata=pd.read_csv(os.path.join(p2s,'GUdata.csv'),encoding='utf-8-sig',header=None)
     GUdata=GUdata.dropna(axis=0,how='all')
     GUdata=GUdata.dropna(axis=1,how='all')
@@ -188,31 +188,6 @@ if Lines:
 ###Well names
 
 wellname=list(pd.read_csv(os.path.join(p2s,'WellsProps.csv'),encoding='utf-8-sig').dropna(axis='columns'))
-
-
-
-if False:
-    ###Initial point of transect. Default is horizontal
-    p0x=x0[np.argmin(x0)]
-    p0y=y0[np.argmin(x0)]
-
-    ###Final point of transect
-    p1x=x0[np.argmax(x0)]
-    p1y=y0[np.argmax(x0)]
-    
-###Vertical
-if False:
-    ###Initial point of transect. Default is horizontal
-    p0x=x0[np.argmin(y0)]
-    p0y=y0[np.argmin(y0)]
-
-    ###Final point of transect
-    p1x=x0[np.argmax(y0)]
-    p1y=y0[np.argmax(y0)]
-
-
-#Let's specify transect coordinates
-
 
 
 
@@ -294,7 +269,82 @@ if Lines:
         zdums2[layer][0:len(zdums)]=zdums
 #        GUdata2=np.append(GUdata2,np.array([xdums2,zdums]),axis=1).astype('int')
 
-    
+    #Let's find unique x values of layer points
+
+    x_lay=np.sort(np.unique(xdums2))
+    x_lay=x_lay[~np.isnan(x_lay)]
+
+    #Let's create array where we will interpolate and extrapolate everything
+    z_lay=np.empty((len(Layers[Layers!=''])+1,len(x_lay)))
+
+    #Let's fill with nas
+    z_lay[:]=np.nan
+
+    #Now, we will loop through layers again
+
+    for layer in range(len(Layers[Layers!=''])+1):
+        #Let's retrieve the vector of x points that we have for this layer
+        x_lay_dum=xdums2[layer]
+        x_lay_dum = x_lay_dum[~np.isnan(x_lay_dum)]
+        #Let's retrieve the vector of z coordinates that we have for this layer
+        z_lay_dum=zdums2[layer]
+        z_lay_dum = z_lay_dum[~np.isnan(z_lay_dum)]
+        #Now, we'll loop through all the unique x points found in all the layers
+        for i in range(len(x_lay)):
+            #Now, we have four possible cases
+            #The first case is that the x coordinate is to the left of the first point where we have
+            #a z coordinate for this layer. In that case, we have to extrapolate to the left, based on the first two
+            #points of the layer
+            if x_lay[i]<x_lay_dum[0]:
+                #Let's get equation of the straight line defined by the first two points of the layer
+                fit = np.polyfit(x_lay_dum[:2], z_lay_dum[:2], 1)
+                line = np.poly1d(fit)
+                z_lay[layer, i]=line(x_lay[i])
+            #The second case we have is that the x coordinate is to the right of the last point where we have
+            #a z coordinate for this layer. In that case, we have to extrapolate to the right, based on the last two
+            #points of the layer
+            elif x_lay[i]>x_lay_dum[-1]:
+                #Let's get equation of the straight line defined by the last two points of the layer
+                fit = np.polyfit(x_lay_dum[-2:], z_lay_dum[-2:], 1)
+                line = np.poly1d(fit)
+                z_lay[layer, i] = line(x_lay[i])
+            #The third case we have is that the x coordinate has a corresponding z coordinate in this layer.
+            #In that case, we retrieve the corresponding z value points of the layer
+            elif x_lay[i] in x_lay_dum:
+                z_lay[layer, i]=np.min(z_lay_dum[x_lay_dum == x_lay[i]])
+
+            #The fourth case we have is that the x coordinate is between two coordinates in this layer.
+            #In that case, we interpolate between the values
+
+            else:
+                #Index of the point to the left
+                ind_left=np.max(np.where(x_lay_dum<x_lay[i]))
+
+                #Index of the point to the right
+                ind_right=np.min(np.where(x_lay_dum>x_lay[i]))
+
+                #X coordinates
+                x_left=x_lay_dum[ind_left]
+                x_right = x_lay_dum[ind_right]
+
+                #Z coordinates
+                z_left=z_lay_dum[ind_left]
+                z_right = z_lay_dum[ind_right]
+
+                fit = np.polyfit(np.array([x_left,x_right]), np.array([z_left,z_right]), 1)
+                line = np.poly1d(fit)
+                z_lay[layer, i] = line(x_lay[i])
+
+        #If we are below the top, we have to crop the interpolated values by whichever is lower, the bottom of the
+        #upper layer (or surface elevation) or the interpolated value
+        if layer>0:
+            z_lay[layer]=np.minimum(z_lay[layer],z_lay[layer-1])
+
+
+    zdums2=z_lay
+    xdums2=x_lay
+
+
 
 
 minx=np.sqrt(p0x**2+p0y**2)
@@ -334,7 +384,7 @@ xticks0=xticks-minx
 #y tickmarks
 dty=5
 #yticks=(np.arange(ylim[0]-dty,ylim[1]+2*dty,dty)/10).astype("int")*10
-yticks=np.arange(int(ylim[0]),int(ylim[1]),dty)
+yticks=np.arange(int(ylim[0]-dty),int(ylim[1]),dty)
 #yticks0=-yticks
 yticks0=yticks
 
@@ -402,7 +452,7 @@ if Lines:
     for layer in range(len(Layers[Layers!=''])):
         #Top
         #Let's remove nas from the top line of the polygon x and y coordinates
-        xdum1=xdums2[layer][~np.isnan(xdums2[layer])]
+        xdum1=xdums2[~np.isnan(xdums2)]
         zdum1=zdums2[layer][~np.isnan(zdums2[layer])]
         #Let's sort from left to right the y coordinates of the line on top according to their x value for the top line of the polygon
         sort_ind_0 = np.argsort(xdum1)
@@ -412,7 +462,7 @@ if Lines:
 
         #Bottom
         # Let's remove nas from the bottom line of the polygon x and y coordinates
-        xdum2=xdums2[layer+1][~np.isnan(xdums2[layer+1])]
+        xdum2=xdums2[~np.isnan(xdums2)]
         zdum2 = zdums2[layer + 1][~np.isnan(zdums2[layer+1])]
 
         #For the bottom line, we sort the points from right to left according to their x coordinate
@@ -472,7 +522,7 @@ str(int(np.amax(xticks)))+'" y2="'+str(max(yticks))+'" stroke="black" />\n'
 #Let's plot y axis
 xytick=str(xlim2[0])
 str0=str0+'\n  <line x1="'+xytick+'" y1="'+str(ylim2[1])+'" x2="'+\
-xytick+'" y2="'+str(ylim2[0])+'" stroke="black" />\n'
+xytick+'" y2="'+str(max(yticks))+'" stroke="black" />\n'
 
 #lets draw x tickmarks
 for tick in range(len(xticks)):
