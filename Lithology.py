@@ -385,7 +385,7 @@ xticks0=xticks-minx
 #y tickmarks
 dty=5
 #yticks=(np.arange(ylim[0]-dty,ylim[1]+2*dty,dty)/10).astype("int")*10
-yticks=np.arange(int(ylim[0]-dty),int(ylim[1]),dty)
+yticks=np.arange(int(ylim[0]/dty)*dty,dty*(1+int(ylim[1]/dty)),dty)
 #yticks0=-yticks
 yticks0=yticks
 
