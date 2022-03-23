@@ -13,7 +13,7 @@ vec_dir=r"\\hydro-nas\Team\Projects\5635_SFEI Carbon and GHG\GIS\vector"
 template_name="DEM_MBK_ft_NGVD29_26910.tif"
 
 #New resolution
-new_res=5
+new_res=100
 
 #Input name
 input_nam="DEM_MBK_ft_NGVD29_26910"
