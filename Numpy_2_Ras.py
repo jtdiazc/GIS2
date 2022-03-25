@@ -3,15 +3,10 @@ import numpy as np
 import os
 
 #List of numpy arrays we have to process
-npdir1=r"\\hydro-nas\Team\Projects\5635_SFEI Carbon and GHG\Accretion\20211223\np_arrays"
-names1=[r"\Draft_1_1_ft\Draft_1_1_ft_2056",r'\Draft_1_1_ft\Draft_1_1_ft_2056_years_to_MTL_10',
-        r"\Draft_1_1_ft\Draft_1_1_ft_2018carbon_rate_gC_cm2_yr",
-        r"\Draft_1_1_ft\Draft_1_1_ft_2056carbon_rate_gC_cm2_yr",
-        r"\Draft_1_1_ft\Draft_1_1_ft_2056carbon_cum_gC_cm2",
-        r'\Draft_2_6_ft\Draft_2_6_ft_2056',r'\Draft_2_6_ft\Draft_2_6_ft_2056_years_to_MTL_10',
-        r'\Draft_2_6_ft\Draft_2_6_ft_2018carbon_rate_gC_cm2_yr',
-        r'\Draft_2_6_ft\Draft_2_6_ft_2056carbon_rate_gC_cm2_yr',
-        r'\Draft_2_6_ft\Draft_2_6_ft_2056carbon_cum_gC_cm2']
+npdir1=r"\\hydro-nas\Team\Projects\5635_SFEI Carbon and GHG\Accretion\20220202\np_arrays"
+names1=['SEDCALC_2_6_ft\SEDCALC_2_6_ft_2100_years_to_MTL_0',
+        'SEDCALC_1_1_ft\SEDCALC_1_1_ft_2100_years_to_MTL_0']
+
 Paths=[npdir1+"\\"+name  for name in names1]
 
 
